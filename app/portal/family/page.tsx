@@ -28,6 +28,12 @@ export default async function Family({ searchParams }: { searchParams: Promise<{
       </div>
       {saved && <p className="notice" role="status">Your profile is saved. Photos you added are in the Gallery too.</p>}
 
+      {h.is_guest ? (
+        <section className="card-strong row between">
+          <p>Join your household to add your own photos and profile here.</p>
+          <a href="/join" className="btn">Join your household</a>
+        </section>
+      ) : (
       <form action={saveProfile} className="card stack-lg">
         <div className="row between">
           <h2>Your household profile</h2>
@@ -60,6 +66,7 @@ export default async function Family({ searchParams }: { searchParams: Promise<{
           </div>
         </div>
       </form>
+      )}
 
       <section className="stack">
         <div className="row between">

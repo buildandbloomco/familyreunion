@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { SignJWT, jwtVerify } from 'jose';
 import crypto from 'crypto';
-import { one } from './db';
+import { one, getSetting } from './db';
 
 const COOKIE = 'bfr_session';
 
@@ -32,7 +32,9 @@ export async function createSession(householdId: number) {
 }
 
 export async function destroySession() {
-  (await cookies()).delete(COOKIE);
+  const c = await cookies();
+  c.delete(COOKIE);
+  c.delete('bfr_guest');
 }
 
 export async function currentHousehold(): Promise<any | null> {
@@ -46,15 +48,48 @@ export async function currentHousehold(): Promise<any | null> {
   }
 }
 
-export async function requireHousehold() {
+export const GUEST_COOKIE = 'bfr_guest';
+
+export const GUEST = {
+  id: 0, name: 'Guest', is_guest: true, is_admin: false, status: 'approved',
+  adults: 0, teens: 0, kids: 0, infants: 0, covered_cents: 0, dues_override_cents: null,
+  volunteer_planning: [], volunteer_event: [], profile_public: false,
+};
+
+export async function guestAllowed(): Promise<boolean> {
+  const a = await getSetting('access');
+  return a.guestPreview !== false;
+}
+
+/** The logged-in household, or a read-only guest when guest preview is on. */
+export async function currentViewer(): Promise<any | null> {
   const h = await currentHousehold();
+  if (h) return h;
+  if ((await cookies()).get(GUEST_COOKIE)?.value && (await guestAllowed())) return GUEST;
+  return null;
+}
+
+/** For pages: households and guests can view. */
+export async function requireHousehold() {
+  const h = await currentViewer();
   if (!h) redirect('/login');
   if (h.status !== 'approved') redirect('/pending');
   return h;
 }
 
+/** For anything that saves: guests are sent to sign up. */
+export async function requireMember() {
+  const h = await currentHousehold();
+  if (!h) {
+    if ((await cookies()).get(GUEST_COOKIE)?.value) redirect('/join?from=guest');
+    redirect('/login');
+  }
+  if (h.status !== 'approved') redirect('/pending');
+  return h;
+}
+
 export async function requireAdmin() {
-  const h = await requireHousehold();
+  const h = await requireMember();
   if (!h.is_admin) redirect('/portal');
   return h;
 }

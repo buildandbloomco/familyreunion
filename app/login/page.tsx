@@ -18,7 +18,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
             <button className="btn">Log in</button>
           </form>
           <p className="small muted">Forgot your password? Ask one of the planners to reset it for you.</p>
-          <p className="small">New here? <Link href="/join" className="bold">Join your household</Link></p>
+          <p className="small">New here? <Link href="/join" className="bold">Join your household</Link> or <a href="/guest" className="bold">look around as a guest</a></p>
         </div>
       </div>
     </>

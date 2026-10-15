@@ -1,7 +1,15 @@
 import { Pool } from 'pg';
 
-const connectionString =
-  process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.DATABASE_URL_UNPOOLED || '';
+function findConnectionString(): string {
+  const env = process.env;
+  const direct = env.DATABASE_URL || env.POSTGRES_URL || env.DATABASE_URL_UNPOOLED || env.POSTGRES_URL_NON_POOLING;
+  if (direct) return direct;
+  // Vercel storage integrations can add a custom prefix (e.g. STORAGE_DATABASE_URL).
+  const key = Object.keys(env).find((k) => /(^|_)(DATABASE_URL|POSTGRES_URL)$/.test(k) && env[k]);
+  return key ? (env[key] as string) : '';
+}
+
+export const connectionString = findConnectionString();
 
 let pool: Pool | null = null;
 function getPool(): Pool {
@@ -141,7 +149,7 @@ export const DEFAULT_SETTINGS: Record<string, any> = {
     depositDue: '', balanceDue: '', lateStarts: '', elderAge: '', under3Free: true,
   },
   payment: { instructions: '' },
-  access: { requireApproval: false },
+  access: { requireApproval: false, guestPreview: true },
   travel: {
     city: '', dates: '', airport: '', reunionDate: '', venueName: '', venueAddress: '', parking: '', mapLink: '',
     schedule: '', hotelName: '', hotelRate: '', hotelCode: '', hotelBookBy: '', hotelLink: '', notes: '',

@@ -32,7 +32,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ w
   const days = daysUntil(travel.reunionDate);
 
   const todos: { title: string; sub: string; href: string; done: boolean }[] = [
-    { title: 'Sign up your household', sub: 'Done. Welcome!', href: '/portal/settings', done: true },
+    h.is_guest
+      ? { title: 'Join your household', sub: 'Takes a couple of minutes', href: '/join', done: false }
+      : { title: 'Sign up your household', sub: 'Done. Welcome!', href: '/portal/settings', done: true },
     ...openPolls.map((p) => ({ title: `Vote: ${p.question}`, sub: p.closes_on ? `Voting closes ${shortDate(p.closes_on)}` : 'Voting is open', href: '/portal/decide', done: false })),
     { title: 'Share an idea in Brainstorm', sub: myIdeas ? `You've shared ${myIdeas}. Keep them coming!` : 'Dates, places, venues, food, shirts, hotels', href: '/portal/brainstorm', done: myIdeas > 0 },
     { title: 'Finish your family profile', sub: h.photo_url ? 'Looking good!' : 'Add a photo so cousins can find you', href: '/portal/family', done: !!h.photo_url && !!h.about },
@@ -49,7 +51,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ w
       <section className="card-dark row between" style={{ gap: 28 }}>
         <div style={{ maxWidth: 560 }}>
           <p className="kicker" style={{ color: 'var(--yellow)', marginBottom: 8 }}>{[travel.dates || 'Summer 2027', travel.city].filter(Boolean).join(' · ')}</p>
-          <h1 style={{ color: 'var(--ground)', fontSize: 36 }}>We're so glad you're here, {h.name}.</h1>
+          <h1 style={{ color: 'var(--ground)', fontSize: 36 }}>{h.is_guest ? "Welcome! We're so glad you're here." : `We're so glad you're here, ${h.name}.`}</h1>
         </div>
         <div style={{ textAlign: 'center', background: 'var(--yellow)', color: 'var(--brown)', borderRadius: 16, padding: '18px 26px' }}>
           {days != null ? (
@@ -102,6 +104,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ w
         </div>
 
         <aside className="side stack-lg">
+          {h.is_guest ? (
+            <section className="card-strong stack" style={{ gap: 10 }}>
+              <h2 style={{ fontSize: 20 }}>Join your household</h2>
+              <p className="small">Signing up gives your household its own portal: your to-do list, your dues, your profile, and a vote on every decision.</p>
+              <Link href="/join" className="btn" style={{ alignSelf: 'flex-start' }}>Join now</Link>
+            </section>
+          ) : (<>
           <section className="card-strong stack" style={{ gap: 10 }}>
             <div className="row between">
               <h2 style={{ fontSize: 20 }}>Your dues</h2>
@@ -127,6 +136,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ w
             </div>
             <Link href="/portal/settings" className="bold" style={{ padding: '6px 0' }}>Update our details</Link>
           </section>
+          </>)}
 
           <section className="card-yellow stack" style={{ gap: 12 }}>
             <h2 style={{ fontSize: 20 }}>New in the Gallery</h2>

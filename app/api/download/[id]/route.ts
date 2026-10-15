@@ -1,8 +1,8 @@
 import { one } from '@/lib/db';
-import { currentHousehold } from '@/lib/auth';
+import { currentViewer } from '@/lib/auth';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const h = await currentHousehold();
+  const h = await currentViewer();
   if (!h || h.status !== 'approved') return new Response('Please log in', { status: 401 });
   const { id } = await params;
   const m = await one('SELECT * FROM media WHERE id = $1 AND kind = $2', [Number(id) || 0, 'photo']);

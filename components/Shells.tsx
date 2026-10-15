@@ -18,11 +18,12 @@ export function PortalShell({ household, active, children }: { household: any; a
       <header className="portal-head">
         <div>
           <Link href="/" className="brand">Banks Family Reunion</Link>
-          <div className="small" style={{ color: 'var(--brown)' }}>Welcome, {household.name}</div>
+          <div className="small" style={{ color: 'var(--brown)' }}>{household.is_guest ? "You're looking around as a guest" : `Welcome, ${household.name}`}</div>
         </div>
         <div className="row">
           {household.is_admin && <Link href="/admin" className="btn btn-outline btn-small">Admin</Link>}
-          <form action={logout}><button className="btn btn-outline btn-small">Log out</button></form>
+          {household.is_guest && <Link href="/join" className="btn btn-small">Join your household</Link>}
+          <form action={logout}><button className="btn btn-outline btn-small">{household.is_guest ? 'Exit' : 'Log out'}</button></form>
         </div>
       </header>
       <nav aria-label="Portal tabs" className="tabs">
@@ -30,7 +31,15 @@ export function PortalShell({ household, active, children }: { household: any; a
           <Link key={href} href={href} className="tab" aria-current={label === active ? 'page' : undefined}>{label}</Link>
         ))}
       </nav>
-      <main className="wrap stack-lg">{children}</main>
+      <main className="wrap stack-lg">
+        {household.is_guest && (
+          <p className="notice row between" role="note">
+            <span>Take a look around! To share ideas, vote, or add photos, join your household. It only takes a couple of minutes.</span>
+            <Link href="/join" className="bold">Join now</Link>
+          </p>
+        )}
+        {children}
+      </main>
     </>
   );
 }

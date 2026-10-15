@@ -308,7 +308,7 @@ export async function saveTravel(fd: FormData) {
 /* Access and admins */
 export async function saveAccess(fd: FormData) {
   await requireAdmin();
-  await setSetting('access', { requireApproval: fd.get('requireApproval') === 'on' });
+  await setSetting('access', { requireApproval: fd.get('requireApproval') === 'on', guestPreview: fd.get('guestPreview') === 'on' });
   refresh();
   redirect('/admin/access?saved=1');
 }

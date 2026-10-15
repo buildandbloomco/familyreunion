@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { q, getSetting } from '@/lib/db';
 import { SiteHeader } from '@/components/Shells';
+import { guestAllowed } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Welcome() {
   const w = await getSetting('welcome');
+  const guest = await guestAllowed();
   const honorees = await q('SELECT * FROM honorees ORDER BY sort, id');
   const memorials = await q("SELECT m.*, h.name AS household FROM memorials m LEFT JOIN households h ON h.id = m.household_id WHERE m.status = 'approved' ORDER BY m.created_at");
 
@@ -15,7 +17,11 @@ export default async function Welcome() {
       <section style={{ maxWidth: 1100, margin: '0 auto', padding: '64px 5% 56px', textAlign: 'center' }}>
         <p className="kicker" style={{ letterSpacing: '0.18em', marginBottom: 12 }}>{w.dateLine}</p>
         <h1 style={{ fontSize: 'clamp(40px, 6vw, 72px)', lineHeight: 1.05, marginBottom: 20 }}>Banks Family Reunion</h1>
-        <p className="lead" style={{ margin: '0 auto 52px', fontSize: 19 }}>{w.tagline}</p>
+        <p className="lead" style={{ margin: '0 auto 28px', fontSize: 19 }}>{w.tagline}</p>
+        <div className="row" style={{ justifyContent: 'center', marginBottom: 52 }}>
+          <Link href="/join" className="btn">Join your household</Link>
+          {guest && <a href="/guest" className="btn btn-outline">Look around as a guest</a>}
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 40, maxWidth: 860, margin: '0 auto' }}>
           {honorees.map((h) => (
             <figure key={h.id} style={{ margin: 0 }}>
@@ -76,6 +82,11 @@ export default async function Welcome() {
           <Link href="/join" className="btn">Join your household</Link>
           <Link href="/login" className="btn btn-outline">Log in</Link>
         </div>
+        {guest && (
+          <p style={{ marginTop: 18 }}>
+            <a href="/guest" className="bold">Or look around first as a guest</a>
+          </p>
+        )}
       </section>
       <footer className="site-foot">Banks Family Reunion 2027 · Honoring {honorees.map((h) => h.name).join(' and ')}</footer>
     </>

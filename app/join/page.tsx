@@ -13,8 +13,12 @@ const ERRORS: Record<string, string> = {
   missing: 'Please fill in your household name, email, and a password of at least 8 characters.',
 };
 
-export default async function Join({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  const { error } = await searchParams;
+const NOTES: Record<string, string> = {
+  guest: "To share ideas, vote, or add photos, join your household first. It only takes a couple of minutes, and you'll go right back to the portal.",
+};
+
+export default async function Join({ searchParams }: { searchParams: Promise<{ error?: string; from?: string }> }) {
+  const { error, from } = await searchParams;
   const access = await getSetting('access');
   return (
     <>
@@ -26,6 +30,7 @@ export default async function Join({ searchParams }: { searchParams: Promise<{ e
             One sign-up per household. {access.requireApproval ? 'Once a planner confirms you, your household portal opens.' : "You'll go straight to your household's portal."}
           </p>
         </div>
+        {from && NOTES[from] && <p className="notice" role="status">{NOTES[from]}</p>}
         {error && ERRORS[error] && <p className="error" role="alert">{ERRORS[error]}</p>}
         <form action={signup} className="stack-lg">
           <fieldset>

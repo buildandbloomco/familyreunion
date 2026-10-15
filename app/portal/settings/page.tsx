@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { requireHousehold } from '@/lib/auth';
 import { PortalShell } from '@/components/Shells';
 import HouseholdFields from '@/components/HouseholdFields';
@@ -14,6 +15,7 @@ const PW: Record<string, [string, string]> = {
 export default async function Settings({ searchParams }: { searchParams: Promise<{ saved?: string; pw?: string }> }) {
   const { saved, pw } = await searchParams;
   const h = await requireHousehold();
+  if (h.is_guest) redirect('/join?from=guest');
   return (
     <PortalShell household={h} active="Home">
       <div className="stack" style={{ gap: 8 }}>

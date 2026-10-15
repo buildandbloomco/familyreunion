@@ -26,6 +26,11 @@ export default async function Access({ searchParams }: { searchParams: Promise<{
           <span><b>Require admin approval</b> before a new household can see the portal.</span>
         </label>
         <p className="small muted">Right now this is {access.requireApproval ? 'on: new households wait for approval.' : 'off: anyone with the link can sign up and get right in.'} Turn it on before sharing the link with the whole family.</p>
+        <label className="check">
+          <input type="checkbox" name="guestPreview" defaultChecked={access.guestPreview !== false} />
+          <span><b>Guest preview.</b> Anyone with the link can look around every tab without logging in. Guests can't post, vote, or upload.</span>
+        </label>
+        <p className="small muted">Turn this off once the planning group has seen the site, since guests can see names, ideas, and photos.</p>
         <div><button className="btn btn-small">Save</button></div>
       </form>
       <section className="card stack">
