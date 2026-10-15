@@ -88,7 +88,10 @@ export default async function Welcome() {
           </p>
         )}
       </section>
-      <footer className="site-foot">Banks Family Reunion 2027 · Honoring {honorees.map((h) => h.name).join(' and ')}</footer>
+      <footer className="site-foot">
+        Banks Family Reunion 2027 · Honoring {honorees.map((h) => h.name).join(' and ')}
+        <div style={{ marginTop: 8 }}><a href="/Banks-Family-Reunion-Guide.pdf" download className="bold">Download the one-page family guide (PDF)</a></div>
+      </footer>
     </>
   );
 }
